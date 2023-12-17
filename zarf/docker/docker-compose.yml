@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  server:
+    container_name: server
+    build:
+      context: ../..
+      dockerfile: zarf/docker/server.Dockerfile
+    ports:
+      - "3333:3333"
+
+  client:
+    container_name: client
+    build:
+      context: ../..
+      dockerfile: zarf/docker/client.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - server
