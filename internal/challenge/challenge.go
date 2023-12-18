@@ -16,6 +16,10 @@ var (
 	ErrChallengeDurationExceeded = errors.New("challenge duration exceeded")
 )
 
+const (
+	HeaderDelimiter = "|"
+)
+
 // validator serves to verify rand values in hashcash
 type validator interface {
 	Validate(key string) bool
@@ -122,7 +126,7 @@ func (c *Challenge) validate(hc *hashcash) error {
 }
 
 func (c *Challenge) headerToHashcash(header string) (*hashcash, error) {
-	segments := strings.Split(header, "|")
+	segments := strings.Split(header, HeaderDelimiter)
 	if len(segments) != 6 {
 		return nil, fmt.Errorf("%w: expected 6 segments in header but got %s", ErrInvalidHeader, header)
 	}

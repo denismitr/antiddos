@@ -72,7 +72,7 @@ func (s *Server) handleConnection(ctx context.Context, conn net.Conn) {
 			return
 		}
 
-		b, err := r.ReadBytes('#')
+		b, err := r.ReadBytes(protocol.Delimiter)
 		if err != nil {
 			if err == io.EOF {
 				slog.Info("connection ended")

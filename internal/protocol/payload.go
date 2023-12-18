@@ -1,10 +1,10 @@
 package protocol
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
+	"encoding/binary"
 )
+
+const Delimiter = '#'
 
 type Action uint16
 
@@ -22,22 +22,20 @@ type Payload struct {
 }
 
 func (p *Payload) Encode() ([]byte, error) {
-	buf := &bytes.Buffer{}
-	enc := json.NewEncoder(buf)
-	if err := enc.Encode(p); err != nil {
-		return nil, fmt.Errorf("failed to encode payload: %w", err)
-	}
-	buf.WriteByte('#')
-	return buf.Bytes(), nil
+	buf := make([]byte, 2+2+len(p.Data)+1)
+	binary.LittleEndian.PutUint16(buf, uint16(p.Action))
+	// todo: verify that data length is not above uint16
+	binary.LittleEndian.PutUint16(buf[2:], uint16(len(p.Data)))
+	copy(buf[4:], p.Data)
+	buf[len(buf)-1] = Delimiter
+	return buf, nil
 }
 
 func Decode(b []byte) (*Payload, error) {
-	buf := bytes.NewReader(b)
-	dec := json.NewDecoder(buf)
 	p := Payload{}
-	if err := dec.Decode(&p); err != nil {
-		return nil, fmt.Errorf("could not Decode payload: %w", err)
-	}
-
+	p.Action = Action(binary.LittleEndian.Uint16(b))
+	length := binary.LittleEndian.Uint16(b[2:])
+	p.Data = make([]byte, length)
+	copy(p.Data, b[4:])
 	return &p, nil
 }

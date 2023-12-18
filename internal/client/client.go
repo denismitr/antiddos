@@ -129,7 +129,7 @@ func (c *Client) sendSolution(_ context.Context, solution string, conn net.Conn)
 }
 
 func (c *Client) readTransmission(ctx context.Context, r *bufio.Reader) (string, error) {
-	resp, err := r.ReadBytes('#')
+	resp, err := r.ReadBytes(protocol.Delimiter)
 	if err != nil {
 		return "", fmt.Errorf("client.Client.readQoute failed to read bytes: %w", err)
 	}
@@ -150,7 +150,7 @@ func (c *Client) readTransmission(ctx context.Context, r *bufio.Reader) (string,
 }
 
 func (c *Client) receiveChallenge(ctx context.Context, r *bufio.Reader) (string, error) {
-	resp, err := r.ReadBytes('#')
+	resp, err := r.ReadBytes(protocol.Delimiter)
 	if err != nil {
 		return "", fmt.Errorf("client.askForChallenge read challange resp failed: %w", err)
 	}
